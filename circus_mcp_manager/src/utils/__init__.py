@@ -19,7 +19,7 @@ from .helpers import (
 
 __all__ = [
     "CircusMCPError",
-    "CircusManagerError", 
+    "CircusManagerError",
     "MCPServerError",
     "LogParserError",
     "IOControllerError",

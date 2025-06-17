@@ -8,6 +8,6 @@ from .stream_manager import StreamManager
 
 __all__ = [
     "InputHandler",
-    "OutputMonitor", 
+    "OutputMonitor",
     "StreamManager",
 ]

@@ -8,6 +8,6 @@ from .watcher import ProcessWatcher
 
 __all__ = [
     "CircusManager",
-    "ConfigHandler", 
+    "ConfigHandler",
     "ProcessWatcher",
 ]
