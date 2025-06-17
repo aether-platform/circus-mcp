@@ -1,0 +1,30 @@
+patterns:
+  error:
+    - regex: "ERROR|Exception|Traceback|Fatal|Critical"
+      priority: 1
+    - regex: "\\[ERROR\\]|\\[FATAL\\]|\\[CRITICAL\\]"
+      priority: 1
+  warning:
+    - regex: "WARNING|WARN"
+      priority: 2
+    - regex: "\\[WARNING\\]|\\[WARN\\]"
+      priority: 2
+  info:
+    - regex: "INFO|Starting|Stopping|Listening|Server"
+      priority: 3
+    - regex: "\\[INFO\\]"
+      priority: 3
+  debug:
+    - regex: "DEBUG"
+      priority: 4
+    - regex: "\\[DEBUG\\]"
+      priority: 4
+
+# Custom patterns can be added here
+custom_patterns: {}
+
+# Configuration for log classification
+classification:
+  default_level: "info"
+  case_sensitive: false
+  multiline_support: true
