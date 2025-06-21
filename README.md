@@ -235,6 +235,7 @@ uv run circus-mcp add myapp "python app.py" \
 
 - **GitHub Issues**: [Report bugs or request features](https://github.com/aether-platform/circus-mcp/issues)
 - **Discussions**: [Join the community](https://github.com/aether-platform/circus-mcp/discussions)
+- **Releases**: [Latest releases and changelogs](https://github.com/aether-platform/circus-mcp/releases)
 
 ### Quick Command Reference
 

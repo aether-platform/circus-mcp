@@ -126,15 +126,22 @@ twine check dist/*
 1. Update version in `pyproject.toml`
 2. Update `CHANGELOG.md`
 3. Create git tag
-4. Build package
-5. Upload to PyPI
+4. Push tag to trigger automated release
 
 ```bash
-git tag v1.0.1
-git push origin v1.0.1
-uv build
-uv publish
+# Update version and changelog, then:
+git add pyproject.toml CHANGELOG.md
+git commit -m "Bump version to v1.0.2"
+git tag v1.0.2
+git push origin main
+git push origin v1.0.2
 ```
+
+The GitHub Actions workflow will automatically:
+- Run tests across multiple platforms
+- Build the package
+- Create GitHub Release with changelog
+- Publish to PyPI
 
 ## Configuration
 
