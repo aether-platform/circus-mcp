@@ -15,7 +15,7 @@ Controller → Service → Domain ← Infrastructure
 ```
 
 - **Controller Layer** (`src/controller/`): MCP protocol handling and external interfaces
-- **Service Layer** (`src/service/`): Application logic and use cases 
+- **Service Layer** (`src/service/`): Application logic and use cases
 - **Domain Layer** (`src/domain/`): Business logic and domain models (framework-independent)
 - **Infrastructure Layer** (`src/infrastructure/`): Data access and external system integration
 

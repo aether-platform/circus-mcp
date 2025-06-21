@@ -31,14 +31,11 @@ jobs:
     - name: Run tests
       run: uv run pytest tests/ -v
 
-    - name: Run type checking
-      run: uv run mypy src/
+    - name: Run linting with ruff
+      run: uv run ruff check src/ tests/
 
-    - name: Run linting
-      run: uv run flake8 src/ tests/
-
-    - name: Check formatting
-      run: uv run black --check src/ tests/
+    - name: Check formatting with ruff
+      run: uv run ruff format --check src/ tests/
 
   build:
     runs-on: ubuntu-latest

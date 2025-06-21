@@ -3,7 +3,7 @@
     "circus-mcp": {
       "command": "uv",
       "args": [
-        "run", 
+        "run",
         "circus-mcp",
         "mcp"
       ],

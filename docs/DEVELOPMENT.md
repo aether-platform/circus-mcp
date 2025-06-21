@@ -11,14 +11,19 @@ cd circus-mcp
 # Install with development dependencies
 uv sync --extra dev
 
-# Run tests
-pytest
+# Setup pre-commit hooks (recommended)
+uv run pre-commit install
+uv run pre-commit install --hook-type pre-push
 
-# Format code
-black src/ tests/
+# Run tests
+uv run pytest
+
+# Lint and format code
+uv run ruff check --fix src/ tests/
+uv run ruff format src/ tests/
 
 # Type checking
-mypy src/
+uv run mypy src/ --ignore-missing-imports
 ```
 
 ### Running Tests
@@ -80,7 +85,7 @@ The MCP server provides the following tools for AI agents:
 
 - `add_process` - Add a new process to Circus
 - `start_process` - Start a process
-- `stop_process` - Stop a process  
+- `stop_process` - Stop a process
 - `restart_process` - Restart a process
 - `list_processes` - List all processes
 - `get_process_status` - Get process status
@@ -183,7 +188,7 @@ For AI agent integration, use `mcp_config.json`:
 - `circus>=0.18.0` - Process manager
 - `pyzmq>=25.0.0` - ZeroMQ for Circus communication
 - `mcp>=1.0.0` - Model Context Protocol
-- `click>=8.1.0` - CLI framework  
+- `click>=8.1.0` - CLI framework
 - `psutil>=5.9.0` - System information
 
 ### Development Dependencies

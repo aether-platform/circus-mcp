@@ -124,7 +124,7 @@ uv run circus-mcp start-all
 ```bash
 # Manage multiple services
 uv run circus-mcp add auth-service "python auth_service.py"
-uv run circus-mcp add user-service "python user_service.py"  
+uv run circus-mcp add user-service "python user_service.py"
 uv run circus-mcp add notification-service "python notification_service.py"
 uv run circus-mcp ensure-started all
 ```
@@ -161,7 +161,7 @@ uv run circus-mcp ensure-stopped worker    # Only stops if running
 ```bash
 # Work with all processes at once
 uv run circus-mcp start-all     # Start everything
-uv run circus-mcp stop-all      # Stop everything  
+uv run circus-mcp stop-all      # Stop everything
 uv run circus-mcp restart-all   # Restart everything
 uv run circus-mcp logs-all      # See all logs
 ```
@@ -247,7 +247,7 @@ uv run circus-mcp start-daemon
 uv run circus-mcp stop-daemon
 uv run circus-mcp daemon-status
 
-# Process Management  
+# Process Management
 uv run circus-mcp add <name> <command>
 uv run circus-mcp start/stop/restart <name>
 uv run circus-mcp ensure-started/ensure-stopped <name>
@@ -281,7 +281,7 @@ We extend our heartfelt gratitude to the **[Circus](https://circus.readthedocs.i
 ## Related Projects
 
 - **[Circus](https://circus.readthedocs.io/)** - The underlying process manager (Thank you to the Circus team!)
-- **[Model Context Protocol](https://modelcontextprotocol.io/)** - AI agent communication standard  
+- **[Model Context Protocol](https://modelcontextprotocol.io/)** - AI agent communication standard
 - **[AetherPlatform](https://github.com/aether-platform)** - Cloud-native development tools
 
 ---

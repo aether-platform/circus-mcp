@@ -218,7 +218,7 @@ Add a new process to Circus.
 ```json
 {
   "name": "string",
-  "command": "string", 
+  "command": "string",
   "numprocesses": "integer (optional, default: 1)",
   "working_dir": "string (optional)"
 }
