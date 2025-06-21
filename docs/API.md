@@ -357,6 +357,8 @@ stdout_stream.filename = /var/log/myapp.log
 
 ### MCP Client Configuration
 
+**Recommended stdio transport method** (as per MCP documentation):
+
 ```json
 {
   "mcpServers": {
@@ -368,6 +370,8 @@ stdout_stream.filename = /var/log/myapp.log
   }
 }
 ```
+
+This configuration uses MCP's stdio transport for secure, direct communication between AI agents and the process manager in local development environments.
 
 ## Error Handling
 

@@ -84,7 +84,7 @@ Circus MCP includes built-in MCP protocol support, allowing AI agents to manage 
 uv run circus-mcp mcp
 ```
 
-Configure in your AI agent:
+Configure in your AI agent using the **recommended stdio transport**:
 ```json
 {
   "mcpServers": {
@@ -95,6 +95,8 @@ Configure in your AI agent:
   }
 }
 ```
+
+**Note**: This tool is designed for local development environments using MCP's stdio transport method as specified in the [MCP documentation](https://modelcontextprotocol.io/). This approach provides secure, direct communication between AI agents and the process manager.
 
 ## Common Use Cases
 
@@ -272,9 +274,13 @@ Check out our [examples repository](https://github.com/aether-platform/circus-mc
 
 MIT License - see [LICENSE](LICENSE) for details.
 
+## Acknowledgments
+
+We extend our heartfelt gratitude to the **[Circus](https://circus.readthedocs.io/)** development team for creating such a robust and reliable process management foundation. Their excellent work made this project possible. Circus MCP builds upon their solid architecture to bring modern AI agent integration to process management.
+
 ## Related Projects
 
-- **[Circus](https://circus.readthedocs.io/)** - The underlying process manager
+- **[Circus](https://circus.readthedocs.io/)** - The underlying process manager (Thank you to the Circus team!)
 - **[Model Context Protocol](https://modelcontextprotocol.io/)** - AI agent communication standard  
 - **[AetherPlatform](https://github.com/aether-platform)** - Cloud-native development tools
 
