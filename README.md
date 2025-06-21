@@ -1,4 +1,4 @@
-# Circus MCP Manager - 新しいアーキテクチャ
+# Circus MCP - 新しいアーキテクチャ
 
 Circus + MCP プロトコルベースのプロセス管理システム（Domain-Driven Design アーキテクチャ）
 
@@ -9,9 +9,11 @@ Circus + MCP プロトコルベースのプロセス管理システム（Domain-
 ### レイヤー構成
 
 ```
-circus_mcp_manager/
-├── app.py                          # メインアプリケーション（エントリーポイント）
+circus-mcp/
 ├── src/
+│   ├── app.py                      # メインアプリケーション（エントリーポイント）
+│   ├── main.py                     # CLI エントリーポイント
+│   ├── circus_cli.py               # CLI インターフェース
 │   ├── controller/                 # コントローラー層
 │   │   ├── __init__.py
 │   │   └── mcp_controller.py       # MCP プロトコル制御

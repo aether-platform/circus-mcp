@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "circus-mcp": {
+      "command": "uv",
+      "args": [
+        "run", 
+        "circus-mcp",
+        "mcp"
+      ],
+      "cwd": "/mnt/c/workspace/vibecoding-platform/mcp/circus",
+      "env": {}
+    }
+  }
+}
