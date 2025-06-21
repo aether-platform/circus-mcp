@@ -8,18 +8,15 @@ version = "1.0.0"
 description = "Simple Circus process management tool"
 readme = "README.md"
 requires-python = ">=3.10"
-license = {text = "MIT"}
+license = "MIT"
 authors = [
-    {name = "Circus MCP Manager Team"}
+    {name = "AetherPlatform", email = "aether-platform@re-x.info"}
 ]
 keywords = ["circus", "mcp", "process-management", "asyncio"]
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -53,9 +50,9 @@ logging = [
 circus-mcp = "circus_mcp.main:main"
 
 [project.urls]
-Homepage = "https://github.com/circus-mcp-manager/circus-mcp-manager"
-Repository = "https://github.com/circus-mcp-manager/circus-mcp-manager.git"
-Documentation = "https://circus-mcp-manager.readthedocs.io/"
+Homepage = "https://github.com/aether-platform/circus-mcp"
+Repository = "https://github.com/aether-platform/circus-mcp.git"
+"Bug Tracker" = "https://github.com/aether-platform/circus-mcp/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -65,7 +62,7 @@ where = ["src"]
 
 [tool.black]
 line-length = 88
-target-version = ['py38']
+target-version = ['py310']
 include = '\.pyi?$'
 extend-exclude = '''
 /(
@@ -82,7 +79,7 @@ extend-exclude = '''
 '''
 
 [tool.mypy]
-python_version = "3.8"
+python_version = "3.10"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true

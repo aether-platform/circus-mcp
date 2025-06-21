@@ -1,343 +1,284 @@
-# Circus MCP - 新しいアーキテクチャ
+# Circus MCP
 
-Circus + MCP プロトコルベースのプロセス管理システム（Domain-Driven Design アーキテクチャ）
+[![PyPI version](https://badge.fury.io/py/circus-mcp.svg)](https://badge.fury.io/py/circus-mcp)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## 🏗️ アーキテクチャ概要
+A simple and powerful process management tool that combines Circus process manager with AI agent integration through the Model Context Protocol (MCP).
 
-このプロジェクトは、Domain-Driven Design (DDD) の原則に基づいて設計された、レイヤー化アーキテクチャを採用しています。
+## What is Circus MCP?
 
-### レイヤー構成
+In today's complex microservices development landscape, Circus MCP enables AI coding agents to work more efficiently, contributing to society through better development productivity.
 
-```
-circus-mcp/
-├── src/
-│   ├── app.py                      # メインアプリケーション（エントリーポイント）
-│   ├── main.py                     # CLI エントリーポイント
-│   ├── circus_cli.py               # CLI インターフェース
-│   ├── controller/                 # コントローラー層
-│   │   ├── __init__.py
-│   │   └── mcp_controller.py       # MCP プロトコル制御
-│   ├── service/                    # アプリケーションサービス層
-│   │   ├── __init__.py
-│   │   ├── process_service.py      # プロセス管理サービス
-│   │   └── log_service.py          # ログ処理サービス
-│   ├── domain/                     # ドメイン層
-│   │   ├── __init__.py
-│   │   └── process.py              # ドメインモデル・ビジネスロジック
-│   └── infrastructure/             # インフラストラクチャ層
-│       ├── __init__.py
-│       └── repositories.py         # データアクセス実装
-├── config/
-│   └── config.yaml                 # 設定ファイル
-├── tests/
-│   ├── __init__.py
-│   └── test_new_architecture.py    # 統合テスト
-└── requirements.txt                # 依存関係
-```
+Circus MCP provides direct process control through the Model Context Protocol, eliminating the overhead of shell commands and reducing token consumption for AI agents managing development environments.
 
-### 依存関係の方向
+**Core Features**:
+- **AI Integration**: Built-in MCP protocol support for coding agents
+- **Simple Commands**: Easy-to-use CLI for developers
+- **Smart Operations**: Idempotent commands that work reliably
+- **Microservices Ready**: Manage multiple services effortlessly
 
-```
-Controller → Service → Domain ← Infrastructure
-```
+## Quick Start
 
-- **Controller層**: MCP プロトコルの処理、外部インターフェース
-- **Service層**: アプリケーションロジック、ユースケース実装
-- **Domain層**: ビジネスロジック、ドメインモデル（他の層に依存しない）
-- **Infrastructure層**: データアクセス、外部システム連携
-
-## 🚀 主な機能
-
-### 1. プロセス管理
-- **プロセス追加・削除**: Circus watcher の動的管理
-- **プロセス制御**: 開始・停止・再起動・リロード
-- **状態監視**: リアルタイムステータス取得
-- **統計情報**: システム全体の統計とメトリクス
-
-### 2. ログ管理
-- **リアルタイム処理**: 非同期バックグラウンド処理
-- **ログ分類**: レベル別自動分類（ERROR, WARNING, INFO, DEBUG, CRITICAL）
-- **アラート機能**: 重要ログの自動検出
-- **統計・分析**: ログレベル分布、エラー率分析
-
-### 3. MCP プロトコル対応
-- **ツール提供**: プロセス管理・ログ取得ツール
-- **リソース公開**: プロセス情報・ログデータのリソース化
-- **JSON-RPC 2.0**: 標準的な MCP プロトコル実装
-
-## 🛠️ 技術スタック
-
-### コア技術
-- **Python 3.8+**: メイン言語
-- **Circus**: プロセス管理デーモン
-- **MCP Protocol**: AI エージェント通信プロトコル
-- **asyncio**: 非同期処理
-
-### 主要ライブラリ
-- `circus`: 公式 Circus クライアントライブラリ
-- `pydantic`: データバリデーション
-- `pyyaml`: 設定ファイル処理
-- `pytest`: テストフレームワーク
-
-## 📦 インストール・セットアップ
-
-### 1. 依存関係のインストール
+### Installation
 
 ```bash
-pip install -r requirements.txt
+uv add circus-mcp
 ```
 
-### 2. Circus デーモンの起動
+### Basic Usage
 
 ```bash
-# Circus 設定ファイルを作成
-cat > circus.ini << EOF
-[circus]
-endpoint = tcp://127.0.0.1:5555
-pubsub_endpoint = tcp://127.0.0.1:5556
+# Start the daemon
+uv run circus-mcp start-daemon
 
-[watcher:dummy]
-cmd = python -c "import time; [time.sleep(1) for _ in iter(int, 1)]"
-numprocesses = 1
-EOF
+# Add and start a web application
+uv run circus-mcp add webapp "python app.py"
+uv run circus-mcp start webapp
 
-# Circus デーモン起動
-circusd circus.ini
+# Check what's running
+uv run circus-mcp overview
+
+# View logs
+uv run circus-mcp logs webapp
 ```
 
-### 3. MCP サーバーの起動
+That's it! Your process is now managed by Circus MCP.
+
+## Key Features
+
+### 🚀 Process Management Made Easy
 
 ```bash
-python app.py
+# Add processes with options
+uv run circus-mcp add api "uvicorn app:api" --numprocesses 4 --working-dir /app
+
+# Smart operations (won't fail if already running)
+uv run circus-mcp ensure-started api
+
+# Bulk operations
+uv run circus-mcp start-all
+uv run circus-mcp restart-all
 ```
 
-## 🔧 設定
-
-[`config/config.yaml`](config/config.yaml) で詳細な設定が可能です：
-
-### 主要設定項目
-- **MCP サーバー設定**: プロトコルバージョン、機能
-- **Circus 接続設定**: エンドポイント、タイムアウト
-- **ログ処理設定**: バックグラウンド処理、保持期間
-- **パフォーマンス設定**: 並行処理数、メモリ制限
-- **セキュリティ設定**: 許可コマンド、パス制限
-
-## 🧪 テスト
-
-### 統合テストの実行
+### 📊 Comprehensive Monitoring
 
 ```bash
-# 全テスト実行
-pytest tests/test_new_architecture.py -v
+# Beautiful overview of all services
+uv run circus-mcp overview
 
-# 特定のテストクラス実行
-pytest tests/test_new_architecture.py::TestNewArchitectureIntegration -v
+# Detailed status information
+uv run circus-mcp status-all
 
-# カバレッジ付きテスト
-pytest tests/test_new_architecture.py --cov=src --cov-report=html
+# Real-time log viewing
+uv run circus-mcp tail api
+uv run circus-mcp logs-all
 ```
 
-### テスト内容
-- **フルスタック統合テスト**: 全レイヤーを通したエンドツーエンドテスト
-- **ログ処理統合テスト**: バックグラウンド処理とパフォーマンステスト
-- **MCP プロトコルテスト**: プロトコル準拠性テスト
-- **ドメインロジックテスト**: ビジネスルール検証
-- **アーキテクチャ境界テスト**: レイヤー分離の検証
+### 🤖 AI Agent Integration
 
-## 📚 使用方法
+Circus MCP includes built-in MCP protocol support, allowing AI agents to manage your processes:
 
-### MCP ツールの使用例
+```bash
+# Start MCP server for AI integration
+uv run circus-mcp mcp
+```
 
-#### 1. プロセス管理
-
+Configure in your AI agent:
 ```json
-// プロセス追加
 {
-  "method": "tools/call",
-  "params": {
-    "name": "add_process",
-    "arguments": {
-      "name": "webapp1",
-      "command": "python app.py",
-      "working_dir": "/app",
-      "num_processes": 2
-    }
-  }
-}
-
-// プロセス開始
-{
-  "method": "tools/call",
-  "params": {
-    "name": "start_process",
-    "arguments": {
-      "name": "webapp1"
+  "mcpServers": {
+    "circus-mcp": {
+      "command": "uv",
+      "args": ["run", "circus-mcp", "mcp"]
     }
   }
 }
 ```
 
-#### 2. ログ取得
+## Common Use Cases
 
-```json
-// ログ取得
-{
-  "method": "tools/call",
-  "params": {
-    "name": "get_logs",
-    "arguments": {
-      "process_name": "webapp1",
-      "limit": 100,
-      "level": "ERROR"
-    }
-  }
-}
+### Web Application Management
 
-// ログ統計
-{
-  "method": "tools/call",
-  "params": {
-    "name": "get_log_summary",
-    "arguments": {
-      "process_name": "webapp1"
-    }
-  }
-}
+```bash
+# Production web app with multiple workers
+uv run circus-mcp add webapp "gunicorn app:application" --numprocesses 4
+uv run circus-mcp add worker "celery worker -A app" --numprocesses 2
+uv run circus-mcp ensure-started all
 ```
 
-### リソースアクセス例
+### Development Environment
 
-```json
-// プロセス情報リソース
-{
-  "method": "resources/read",
-  "params": {
-    "uri": "process://webapp1/info"
-  }
-}
-
-// ログリソース
-{
-  "method": "resources/read",
-  "params": {
-    "uri": "logs://webapp1/recent"
-  }
-}
+```bash
+# Start your development stack
+uv run circus-mcp add frontend "npm run dev" --working-dir /app/frontend
+uv run circus-mcp add backend "python manage.py runserver" --working-dir /app/backend
+uv run circus-mcp add redis "redis-server"
+uv run circus-mcp start-all
 ```
 
-## 🔍 アーキテクチャの詳細
+### Microservices
 
-### Domain層 (`src/domain/process.py`)
+```bash
+# Manage multiple services
+uv run circus-mcp add auth-service "python auth_service.py"
+uv run circus-mcp add user-service "python user_service.py"  
+uv run circus-mcp add notification-service "python notification_service.py"
+uv run circus-mcp ensure-started all
+```
 
-**責務**: ビジネスロジックとドメインモデル
+## Why Circus MCP?
 
-- `ProcessInfo`, `ProcessConfig`: ドメインエンティティ
-- `LogEntry`, `LogLevel`: ログドメインモデル
-- `ProcessDomainService`: プロセス関連ビジネスルール
-- `LogDomainService`: ログ関連ビジネスルール
-- `ProcessRepository`, `LogRepository`: データアクセスインターフェース
+### vs. Docker Compose
+- **Lighter**: No containers needed, just process management
+- **Faster**: Direct process execution, no container overhead
+- **Simpler**: One command to rule them all
 
-### Service層 (`src/service/`)
+### vs. systemd
+- **User-friendly**: Simple commands instead of unit files
+- **Cross-platform**: Works on any system with Python
+- **AI-ready**: Built-in MCP support for automation
 
-**責務**: アプリケーションロジックとユースケース
+### vs. PM2
+- **Python-native**: Perfect for Python applications
+- **AI integration**: MCP protocol support out of the box
+- **Comprehensive**: Process + log management in one tool
 
-- `ProcessService`: プロセス管理のユースケース実装
-- `LogService`: ログ処理のユースケース実装
-- Circus クライアントとの連携
-- バックグラウンド処理の管理
+## Advanced Features
 
-### Controller層 (`src/controller/mcp_controller.py`)
+### Intelligent State Management
 
-**責務**: MCP プロトコル処理と外部インターフェース
+```bash
+# These commands are safe to run multiple times
+uv run circus-mcp ensure-started webapp    # Only starts if not running
+uv run circus-mcp ensure-stopped worker    # Only stops if running
+```
 
-- MCP プロトコル準拠の実装
-- ツール定義とリソース管理
-- JSON-RPC 2.0 メッセージ処理
-- エラーハンドリングとレスポンス生成
+### Bulk Operations
 
-### Infrastructure層 (`src/infrastructure/repositories.py`)
+```bash
+# Work with all processes at once
+uv run circus-mcp start-all     # Start everything
+uv run circus-mcp stop-all      # Stop everything  
+uv run circus-mcp restart-all   # Restart everything
+uv run circus-mcp logs-all      # See all logs
+```
 
-**責務**: データアクセスと外部システム連携
+### Log Management
 
-- `InMemoryProcessRepository`: インメモリデータストレージ
-- `InMemoryLogRepository`: インメモリログストレージ
-- 将来の拡張: ファイルベース、データベースリポジトリ
+```bash
+# View logs with filtering
+uv run circus-mcp logs webapp --lines 100 --stream stderr
+uv run circus-mcp tail webapp --stream stdout
 
-## 🚀 パフォーマンス最適化
+# See recent activity across all services
+uv run circus-mcp logs-all
+```
 
-### 1. 非同期処理
-- 全ての I/O 操作を非同期化
-- バックグラウンドタスクによる並行処理
-- キューイングシステムによる負荷分散
+## Installation & Setup
 
-### 2. メモリ管理
-- ログエントリの自動クリーンアップ
-- 設定可能なメモリ制限
-- ガベージコレクション最適化
+### System Requirements
 
-### 3. 接続管理
-- Circus クライアントの接続プール
-- 自動再接続機能
-- タイムアウト設定
+- Python 3.10 or higher
+- Any operating system (Linux, macOS, Windows)
 
-## 🔒 セキュリティ
+### Installation Options
 
-### 1. コマンド制限
-- 許可されたコマンドのホワイトリスト
-- パス制限による安全な実行環境
-- リソース制限の設定
+```bash
+# From PyPI (recommended)
+uv add circus-mcp
 
-### 2. 入力検証
-- Pydantic による厳密なデータバリデーション
-- SQL インジェクション対策
-- パス トラバーサル対策
+# With pip (alternative)
+pip install circus-mcp
 
-## 🔄 拡張性
+# From source
+git clone https://github.com/aether-platform/circus-mcp.git
+cd circus-mcp
+uv sync
+```
 
-### 1. リポジトリパターン
-- インターフェースベースの設計
-- 複数のストレージバックエンド対応
-- プラグイン形式での機能拡張
+### Verify Installation
 
-### 2. 設定駆動
-- YAML ベースの柔軟な設定
-- 環境別設定の対応
-- ホットリロード機能
+```bash
+uv run circus-mcp --help
+uv run circus-mcp daemon-status
+```
 
-## 📈 監視・運用
+## Configuration
 
-### 1. ログ監視
-- 構造化ログ出力
-- レベル別ログ分類
-- アラート機能
+Circus MCP works out of the box with sensible defaults. For advanced usage:
 
-### 2. メトリクス
-- プロセス統計情報
-- パフォーマンスメトリクス
-- リソース使用量監視
+### Custom Circus Configuration
 
-## 🤝 貢献
+```bash
+# Use your own circus.ini
+uv run circus-mcp start-daemon -c /path/to/your/circus.ini
+```
 
-### 開発ガイドライン
-1. Domain-Driven Design 原則の遵守
-2. レイヤー間の依存関係ルールの維持
-3. 包括的なテストの作成
-4. 設定駆動の機能実装
+### Process Configuration
 
-### コードスタイル
-- PEP 8 準拠
-- Type hints の使用
-- Docstring の記述
-- 適切なエラーハンドリング
+```bash
+# Add processes with full configuration
+uv run circus-mcp add myapp "python app.py" \
+  --numprocesses 4 \
+  --working-dir /app \
+```
 
-## 📄 ライセンス
+## Getting Help
 
-MIT License
+### Documentation
 
-## 📞 サポート
+- **[Development Guide](docs/DEVELOPMENT.md)** - For contributors and advanced usage
+- **[API Reference](docs/API.md)** - Complete command and API documentation
 
-問題や質問がある場合は、GitHub Issues でお知らせください。
+### Support
+
+- **GitHub Issues**: [Report bugs or request features](https://github.com/aether-platform/circus-mcp/issues)
+- **Discussions**: [Join the community](https://github.com/aether-platform/circus-mcp/discussions)
+
+### Quick Command Reference
+
+```bash
+# Daemon
+uv run circus-mcp start-daemon
+uv run circus-mcp stop-daemon
+uv run circus-mcp daemon-status
+
+# Process Management  
+uv run circus-mcp add <name> <command>
+uv run circus-mcp start/stop/restart <name>
+uv run circus-mcp ensure-started/ensure-stopped <name>
+
+# Monitoring
+uv run circus-mcp overview
+uv run circus-mcp status-all
+uv run circus-mcp logs <name>
+
+# AI Integration
+uv run circus-mcp mcp
+```
+
+## Examples Repository
+
+Check out our [examples repository](https://github.com/aether-platform/circus-mcp-examples) for real-world usage patterns:
+
+- Django + Celery setup
+- FastAPI microservices
+- React + Node.js development stack
+- Machine learning pipeline management
+
+## License
+
+MIT License - see [LICENSE](LICENSE) for details.
+
+## Related Projects
+
+- **[Circus](https://circus.readthedocs.io/)** - The underlying process manager
+- **[Model Context Protocol](https://modelcontextprotocol.io/)** - AI agent communication standard  
+- **[AetherPlatform](https://github.com/aether-platform)** - Cloud-native development tools
 
 ---
 
-**注意**: このプロジェクトは、従来の基本実装から Domain-Driven Design アーキテクチャに完全に再構築されました。新しいアーキテクチャにより、保守性、テスト容易性、拡張性が大幅に向上しています。
+**Made with ❤️ by [AetherPlatform](https://github.com/aether-platform)**
+
+*Circus MCP: Simple process management, powerful automation.*
