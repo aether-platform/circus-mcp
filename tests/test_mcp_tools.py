@@ -29,29 +29,30 @@ class TestCircusManager:
     @pytest.mark.asyncio
     async def test_connect_success(self, manager):
         """Test successful connection to Circus"""
-        # Create a mock client that behaves predictably
+        # Import the module to ensure we're patching the right location
+        import circus_mcp.manager as manager_module
+
+        # Create a mock client
         mock_client = Mock()
-        mock_client.call = Mock()
 
-        # Define a simple async function that always succeeds
-        async def successful_thread_call(func, *args, **kwargs):
-            return {"status": "ok"}
+        # Mock the CircusClient class and asyncio.to_thread function
+        with patch.object(
+            manager_module, "CircusClient", return_value=mock_client
+        ) as mock_client_class:
+            with patch.object(manager_module, "asyncio") as mock_asyncio:
+                # Set up the asyncio.to_thread mock to return a coroutine
+                async def mock_to_thread(func, *args, **kwargs):
+                    return {"status": "ok"}
 
-        # Patch both the CircusClient constructor and asyncio.to_thread
-        with (
-            patch("circus_mcp.manager.CircusClient") as mock_client_class,
-            patch("circus_mcp.manager.asyncio.to_thread", side_effect=successful_thread_call),
-        ):
-            mock_client_class.return_value = mock_client
+                mock_asyncio.to_thread = mock_to_thread
 
-            result = await manager.connect()
+                # Call the connect method
+                result = await manager.connect()
 
-            # Verify the result
-            assert result is True
-            assert manager.client is mock_client
-
-            # Verify that CircusClient was called with correct endpoint
-            mock_client_class.assert_called_once_with(endpoint="tcp://127.0.0.1:5555")
+                # Verify the results
+                assert result is True
+                assert manager.client is mock_client
+                mock_client_class.assert_called_once_with(endpoint="tcp://127.0.0.1:5555")
 
     @pytest.mark.asyncio
     async def test_connect_failure(self, manager):
