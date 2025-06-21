@@ -4,7 +4,36 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A simple and powerful process management tool that combines Circus process manager with AI agent integration through the Model Context Protocol (MCP).
+**Simplify development server management and log reading for AI coding agents.**
+
+Circus MCP provides coding agents with streamlined access to development server startup and log monitoring through the Model Context Protocol (MCP). By offering direct process management capabilities, it eliminates the complexity of shell command parsing and reduces token consumption for AI agents working in development environments.
+
+## MCP Integration Sequence
+
+```mermaid
+sequenceDiagram
+    participant Agent as AI Coding Agent
+    participant MCP as Circus MCP Server
+    participant Circus as Circus Daemon
+    participant Process as Development Server
+
+    Agent->>MCP: Request: add_process("webapp", "npm run dev")
+    MCP->>Circus: Add watcher configuration
+    Circus-->>MCP: Process added successfully
+    MCP-->>Agent: {"status": "ok", "message": "Process added"}
+
+    Agent->>MCP: Request: start_process("webapp")
+    MCP->>Circus: Start watcher
+    Circus->>Process: Launch npm run dev
+    Process-->>Circus: Process started (PID: 1234)
+    Circus-->>MCP: Process status: active
+    MCP-->>Agent: {"status": "ok", "process": "webapp"}
+
+    Agent->>MCP: Request: get_logs("webapp", lines=50)
+    MCP->>Circus: Fetch stdout/stderr logs
+    Circus-->>MCP: Log entries
+    MCP-->>Agent: {"status": "ok", "logs": ["Server started on port 3000..."]}
+```
 
 ## What is Circus MCP?
 
