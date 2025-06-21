@@ -142,7 +142,7 @@ wheels = [
 
 [[package]]
 name = "circus-mcp"
-version = "1.0.0"
+version = "1.0.1"
 source = { editable = "." }
 dependencies = [
     { name = "circus" },
@@ -173,7 +173,7 @@ requires-dist = [
     { name = "click", specifier = ">=8.1.0" },
     { name = "colorlog", marker = "extra == 'logging'", specifier = ">=6.7.0" },
     { name = "flake8", marker = "extra == 'dev'", specifier = ">=6.0.0" },
-    { name = "mcp", specifier = ">=1.0.0" },
+    { name = "mcp", specifier = ">=1.1.0" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.5.0" },
     { name = "psutil", specifier = ">=5.9.0" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.4.0" },

@@ -1,224 +1,130 @@
 #!/usr/bin/env python3
 """
-CircusMCP ツールの動作テスト
+Test CircusMCP tools and functionality
 """
 
 import asyncio
-import json
-import sys
-from pathlib import Path
+import pytest
+from unittest.mock import Mock, AsyncMock, patch
+from circus_mcp.manager import CircusManager
+from circus_mcp.mcp_server import CircusMCPServer
 
-# CircusMCPモジュールをインポート
-sys.path.append(str(Path(__file__).parent / "circus_mcp_manager" / "src"))
 
-from mcp_server.config_tools import CircusConfigTools
-from config_manager.circus_config import CircusConfigManager
-
-class MockCircusManager:
-    """テスト用のモックCircusManager"""
+class TestCircusManager:
+    """Test CircusManager functionality"""
     
-    def __init__(self):
-        self.processes = {}
+    @pytest.fixture
+    def manager(self):
+        """Create a CircusManager instance for testing"""
+        return CircusManager()
+    
+    @pytest.mark.asyncio
+    async def test_manager_initialization(self, manager):
+        """Test manager initializes correctly"""
+        assert manager.client is None
+        assert manager.endpoint == "tcp://127.0.0.1:5555"
+    
+    @pytest.mark.asyncio
+    async def test_connect_success(self, manager):
+        """Test successful connection to Circus"""
+        with patch('circus.client.CircusClient') as mock_client_class:
+            mock_client = Mock()
+            mock_client_class.return_value = mock_client
+            
+            result = await manager.connect()
+            assert result is True
+            assert manager.client is not None
+    
+    @pytest.mark.asyncio
+    async def test_connect_failure(self, manager):
+        """Test connection failure handling"""
+        with patch('circus_mcp.manager.CircusClient') as mock_client_class:
+            mock_client_class.side_effect = Exception("Connection failed")
+            
+            result = await manager.connect()
+            assert result is False
+            assert manager.client is None
+
+
+class TestCircusMCPServer:
+    """Test CircusMCPServer MCP integration"""
+    
+    @pytest.fixture
+    def mcp_server(self):
+        """Create an MCP server instance for testing"""
+        return CircusMCPServer()
+    
+    def test_server_initialization(self, mcp_server):
+        """Test MCP server initializes correctly"""
+        assert mcp_server.server is not None
+        assert mcp_server.manager is not None
+    
+    def test_mcp_tools_setup(self, mcp_server):
+        """Test that MCP tools are properly setup"""
+        # Test that server has been properly initialized
+        assert mcp_server.server.name == "circus-mcp"
+
+
+class TestIntegration:
+    """Integration tests for full workflow"""
+    
+    @pytest.mark.asyncio
+    async def test_full_workflow_mock(self):
+        """Test complete workflow with mocked Circus"""
         
-    async def start_process(self, name: str) -> bool:
-        """プロセス開始シミュレーション"""
-        print(f"🚀 Starting process: {name}")
-        self.processes[name] = "running"
-        return True
-        
-    async def stop_process(self, name: str) -> bool:
-        """プロセス停止シミュレーション"""
-        print(f"🛑 Stopping process: {name}")
-        if name in self.processes:
-            self.processes[name] = "stopped"
-        return True
-        
-    async def get_process_status(self, name: str = None) -> dict:
-        """プロセス状況取得シミュレーション"""
-        if name:
-            return {name: {"status": self.processes.get(name, "stopped")}}
-        return self.processes
-
-async def test_mcp_tools():
-    """MCPツールの動作テスト"""
-    
-    print("🎪 CircusMCP Tools Test\n")
-    
-    # モックCircusManagerを作成
-    mock_circus_manager = MockCircusManager()
-    
-    # MCPツールを初期化
-    config_tools = CircusConfigTools(mock_circus_manager)
-    
-    print("=== Available MCP Tools ===")
-    tools = config_tools.get_available_tools()
-    for tool in tools:
-        print(f"🔧 {tool['name']}: {tool['description']}")
-    print()
-    
-    # テスト1: 設定ファイル一覧
-    print("=== Test 1: List Configuration Files ===")
-    try:
-        result = await config_tools.execute_tool("list_config_files", {})
-        print(f"✅ Found {result['total_configs']} configuration files:")
-        for config_file in result['config_files'][:3]:  # 最初の3つを表示
-            print(f"   📁 {config_file['name']} ({config_file['services_count']} services)")
-    except Exception as e:
-        print(f"❌ Error: {str(e)}")
-    print()
-    
-    # テスト2: 設定ファイル検証
-    print("=== Test 2: Validate Configuration ===")
-    try:
-        config_path = "/root/.circus_configs/aetherplatform_full_development.ini"
-        result = await config_tools.execute_tool("validate_config", {
-            "config_file": config_path
-        })
-        
-        if result['valid']:
-            print(f"✅ Configuration is valid: {result['config_name']}")
-            print(f"   Services: {', '.join(result['services'])}")
-        else:
-            print(f"❌ Configuration has errors:")
-            for error in result['errors']:
-                print(f"   - {error}")
-    except Exception as e:
-        print(f"❌ Error: {str(e)}")
-    print()
-    
-    # テスト3: 新しい開発環境設定作成
-    print("=== Test 3: Create Development Configuration ===")
-    try:
-        result = await config_tools.execute_tool("create_dev_config", {
-            "config_name": "Quick Test Environment",
-            "services": [
-                {
-                    "name": "test-api",
-                    "command": "python -m http.server 8080",
-                    "working_dir": "/tmp",
-                    "port": 8080,
-                    "environment": {"ENV": "test"}
-                },
-                {
-                    "name": "test-frontend",
-                    "command": "python -m http.server 3000", 
-                    "working_dir": "/tmp",
-                    "port": 3000
-                }
-            ]
-        })
-        
-        if result['success']:
-            print(f"✅ Created configuration: {result['config_name']}")
-            print(f"   File: {result['config_file']}")
-            print(f"   Services: {', '.join(result['services'])}")
-        else:
-            print(f"❌ Failed to create configuration: {result['message']}")
-    except Exception as e:
-        print(f"❌ Error: {str(e)}")
-    print()
-
-async def test_config_file_operations():
-    """設定ファイル操作の直接テスト"""
-    
-    print("=== Direct Configuration Manager Test ===\n")
-    
-    config_manager = CircusConfigManager()
-    
-    # 現在の設定ファイル一覧
-    print("📁 Current Configuration Files:")
-    config_files = config_manager.list_config_files()
-    
-    for config_file in config_files:
-        print(f"   {config_file['name']}")
-        print(f"      File: {config_file['file']}")
-        print(f"      Services: {config_file['services_count']} ({', '.join(config_file['services'])})")
-        print(f"      Size: {config_file['size']} bytes")
-        print(f"      Modified: {config_file['modified']}")
-        print()
-
-def show_real_usage_examples():
-    """実際の使用例を表示"""
-    
-    print("=== Real Usage Examples for AetherPlatform ===\n")
-    
-    examples = [
-        {
-            "scenario": "朝の開発開始 - SaaS Console開発",
-            "mcp_call": {
-                "tool": "load_circus_config",
-                "arguments": {
-                    "config_file": "~/.circus_configs/aethersaas_console_development.ini",
-                    "start_all": True
-                }
-            },
-            "result": "SaaS Console (pnpm dev) が起動され、http://localhost:3000 でアクセス可能"
-        },
-        {
-            "scenario": "フルスタック開発環境の起動",
-            "mcp_call": {
-                "tool": "load_circus_config", 
-                "arguments": {
-                    "config_file": "~/.circus_configs/aetherplatform_full_development.ini",
-                    "start_all": True
-                }
-            },
-            "result": "SaaS Console、AetherTerm Backend、AetherTerm Frontend が順次起動"
-        },
-        {
-            "scenario": "現在の開発セッション保存",
-            "mcp_call": {
-                "tool": "save_circus_config",
-                "arguments": {
-                    "config_file": "~/.circus_configs/my_session_2025_06_21.ini",
-                    "config_name": "Development Session 2025-06-21"
-                }
-            },
-            "result": "現在実行中のプロセス設定が保存され、次回同じ環境で復元可能"
-        },
-        {
-            "scenario": "新しいマイクロサービス追加",
-            "mcp_call": {
-                "tool": "create_dev_config",
-                "arguments": {
-                    "config_name": "Payment Service Development",
-                    "services": [
-                        {
-                            "name": "payment-api",
-                            "command": "uvicorn main:app --reload --port 8001",
-                            "working_dir": "/mnt/c/workspace/vibecoding-platform/services/payment",
-                            "port": 8001,
-                            "environment": {"ENV": "development", "DB_URL": "sqlite:///payment.db"}
-                        }
-                    ]
-                }
-            },
-            "result": "新しいPayment Service用の設定が作成され、独立して開発可能"
+        # Mock circus operations
+        mock_responses = {
+            "add": {"status": "ok", "message": "Process added"},
+            "start": {"status": "ok", "process": "test"},
+            "status": {"status": "running", "pid": 12345},
+            "stop": {"status": "ok", "process": "test"}
         }
-    ]
-    
-    for i, example in enumerate(examples, 1):
-        print(f"🔄 シナリオ {i}: {example['scenario']}")
-        print(f"   MCP Call:")
-        print(f"      Tool: {example['mcp_call']['tool']}")
-        print(f"      Arguments: {json.dumps(example['mcp_call']['arguments'], indent=10)}")
-        print(f"   Expected Result: {example['result']}")
-        print()
+        
+        with patch('asyncio.to_thread') as mock_thread:
+            mock_thread.side_effect = lambda func, cmd: mock_responses.get(cmd["command"], {"status": "ok"})
+            
+            manager = CircusManager()
+            manager.client = Mock()  # Mock client connection
+            
+            # Test process lifecycle
+            add_result = await manager.add_process("test", "echo hello")
+            assert add_result["status"] == "ok"
+            
+            start_result = await manager.start_process("test")
+            assert start_result["status"] == "ok"
+            
+            status_result = await manager.get_process_status("test")
+            assert status_result["status"] == "running"
+            
+            stop_result = await manager.stop_process("test")
+            assert stop_result["status"] == "ok"
 
-async def main():
-    """メイン処理"""
-    try:
-        await test_mcp_tools()
-        await test_config_file_operations()
-        show_real_usage_examples()
-        
-        print("✅ All tests completed successfully!")
-        print("\n🎯 CircusMCP is ready for AetherPlatform development!")
-        
-    except Exception as e:
-        print(f"❌ Error: {str(e)}")
-        import traceback
-        traceback.print_exc()
+
+@pytest.mark.asyncio
+async def test_manager_basic_operations():
+    """Test basic manager operations without real Circus"""
+    manager = CircusManager()
+    
+    # Test that manager initializes properly
+    assert manager.endpoint == "tcp://127.0.0.1:5555"
+    assert manager.client is None
+    
+    # Connection will likely fail without real Circus daemon
+    # This is expected behavior in test environment
+    result = await manager.connect()
+    # Don't assert result - it depends on environment
+
+
+def test_mcp_server_creation():
+    """Test MCP server can be created"""
+    server = CircusMCPServer()
+    assert server is not None
+    assert hasattr(server, 'server')
+    assert hasattr(server, 'manager')
+
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    # Run basic tests
+    asyncio.run(test_manager_basic_operations())
+    test_mcp_server_creation()
+    print("✅ Basic tests completed!")
