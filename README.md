@@ -49,6 +49,17 @@ claude mcp add circus-mcp -- uv run circus-mcp mcp
 }
 ```
 
+## Circus MCP vs Supervisord MCP
+
+| | Circus MCP | [Supervisord MCP](https://github.com/aether-platform/supervisord-mcp) |
+|--|-----------|---------------|
+| Dynamic process addition | Via API | Not supported (requires config file edit + reload) |
+| Log retrieval | stdout + stderr in one call | Separate calls |
+| System stats (CPU/memory) | Available | Not available |
+| Idempotent operations | `ensure_started` / `ensure_stopped` | Throws error if already running |
+| Transport | ZeroMQ (async) | HTTP XML-RPC (sync) |
+| Best for | **AI agent workflows** | Existing Supervisord environments |
+
 ## Documentation
 
 - [AI Token Reduction Solution](https://docs.aether-platform.com/en/solutions/ai-token-reduction/) — Token cost analysis, team-scale projections, research references
