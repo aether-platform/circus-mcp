@@ -23,6 +23,7 @@ src/circus_mcp/
 ```
 
 **Why Simple?**
+
 - **AI Agent Efficiency**: Less complexity means more reliable AI integration
 - **Token Conservation**: Direct operations instead of parsing shell outputs
 - **Maintenance**: Easy to understand and extend
@@ -30,6 +31,7 @@ src/circus_mcp/
 ### Key Design Decisions
 
 #### 1. Direct Circus Integration
+
 ```python
 # Direct ZeroMQ communication - no shell commands
 from circus.client import CircusClient
@@ -37,11 +39,13 @@ result = await asyncio.to_thread(client.call, {"command": "start", "properties":
 ```
 
 **Benefits for AI Agents**:
+
 - Structured JSON responses instead of parsing text output
 - Immediate status feedback without multiple command executions
 - Reliable error handling
 
 #### 2. MCP Protocol Native Support
+
 ```python
 # AI agents can directly call process management functions
 {
@@ -51,12 +55,15 @@ result = await asyncio.to_thread(client.call, {"command": "start", "properties":
 ```
 
 **Token Savings**:
+
 - No need to generate shell commands
 - No output parsing required
 - Bulk operations reduce interaction count
 
 #### 3. Environment Compatibility
+
 Works with any development environment without configuration:
+
 - Node.js with nvm
 - Python with uv/poetry/pipenv
 - Any tool available in PATH

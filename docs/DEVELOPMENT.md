@@ -143,6 +143,7 @@ git push origin v1.0.2
 ```
 
 The GitHub Actions workflow will automatically:
+
 - Run tests across multiple platforms
 - Build the package
 - Create GitHub Release with changelog
@@ -205,6 +206,7 @@ For AI agent integration, use `mcp_config.json`:
 ### Common Issues
 
 1. **Circus daemon not running**
+
    ```bash
    uv run circus-mcp start-daemon
    ```

@@ -4,9 +4,9 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**Cut 75-80% of AI agent debugging tokens. Process management via MCP — structured tools replace shell commands.**
+**Cut 75-80% of AI agent debugging tokens in development cycle. Process management via MCP — structured tools replace shell commands.**
 
-## 75-80% Token Reduction for AI Agent Debugging
+## 75-80% Token Reduction for AI Agent Debugging in Development Cycle
 
 AI agents debugging processes via raw shell commands (`supervisorctl`, `ps`, `journalctl`) burn most of their tokens on unstructured output parsing, repeated commands, and inter-step reasoning. Circus MCP replaces this with structured, bounded MCP tool responses.
 
