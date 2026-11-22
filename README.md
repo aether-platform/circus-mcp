@@ -30,10 +30,12 @@ Circus MCP exposes process lifecycle operations as MCP tools. AI agents call str
 | `restart_process`    | `name`                                             | Restart a process             |
 | `add_process`        | `name`, `command`, `numprocesses?`, `working_dir?` | Add a new process dynamically |
 
+> **Temporary workaround (until 1.1.0):** the current release does not cap its `mcp` dependency, so a fresh install resolves `mcp` 2.x and the MCP server crashes on startup with `AttributeError: 'Server' object has no attribute 'list_tools'`. Until 1.1.0 (which pins `mcp>=1.30,<2`) is released, launch it with `--with 'mcp<2'` as shown below (or `uvx --with 'mcp<2' circus-mcp mcp` without installing). Once 1.1.0 is out, this extra flag can be dropped.
+
 ### Claude Code
 
 ```bash
-claude mcp add circus-mcp -- uv run circus-mcp mcp
+claude mcp add circus-mcp -- uv run --with 'mcp<2' circus-mcp mcp
 ```
 
 ### VS Code / Cursor
@@ -45,7 +47,7 @@ claude mcp add circus-mcp -- uv run circus-mcp mcp
   "servers": {
     "circus-mcp": {
       "command": "uv",
-      "args": ["run", "circus-mcp", "mcp"]
+      "args": ["run", "--with", "mcp<2", "circus-mcp", "mcp"]
     }
   }
 }
