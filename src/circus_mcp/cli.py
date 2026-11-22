@@ -659,16 +659,49 @@ def logs_all():
 
 
 @cli.command()
-def mcp():
-    """Start MCP server."""
+@click.option(
+    "--endpoint",
+    envvar="CIRCUS_ENDPOINT",
+    show_envvar=True,
+    default="tcp://127.0.0.1:5555",
+    help="Circus control endpoint (ipc:// or loopback tcp:// only, by default)",
+)
+@click.option(
+    "--allow-write",
+    is_flag=True,
+    envvar="CIRCUS_MCP_ALLOW_WRITE",
+    show_envvar=True,
+    help="Expose start_process / stop_process / restart_process",
+)
+@click.option(
+    "--allow-add",
+    is_flag=True,
+    envvar="CIRCUS_MCP_ALLOW_ADD",
+    show_envvar=True,
+    help="Expose add_process (lets the agent run arbitrary commands as the circusd user)",
+)
+@click.option(
+    "--allow-remote-endpoint",
+    is_flag=True,
+    envvar="CIRCUS_MCP_ALLOW_REMOTE_ENDPOINT",
+    show_envvar=True,
+    help="Allow a non-loopback tcp:// endpoint (the Circus socket is unauthenticated)",
+)
+def mcp(endpoint: str, allow_write: bool, allow_add: bool, allow_remote_endpoint: bool):
+    """Start MCP server (read-only unless --allow-write / --allow-add)."""
+    from .mcp_server import CircusMCPServer, EndpointNotAllowedError
 
-    async def _mcp():
-        from .mcp_server import CircusMCPServer
+    try:
+        server = CircusMCPServer(
+            endpoint=endpoint,
+            allow_write=allow_write,
+            allow_add=allow_add,
+            allow_remote_endpoint=allow_remote_endpoint,
+        )
+    except EndpointNotAllowedError as e:
+        raise click.UsageError(str(e)) from None
 
-        server = CircusMCPServer()
-        await server.run()
-
-    asyncio.run(_mcp())
+    asyncio.run(server.run())
 
 
 if __name__ == "__main__":

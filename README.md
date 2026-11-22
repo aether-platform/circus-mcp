@@ -25,17 +25,30 @@ Circus MCP exposes process lifecycle operations as MCP tools. AI agents call str
 | -------------------- | -------------------------------------------------- | ----------------------------- |
 | `list_processes`     | —                                                  | List all managed processes    |
 | `get_process_status` | `name`                                             | Process state and PID         |
-| `start_process`      | `name`                                             | Start a process               |
-| `stop_process`       | `name`                                             | Stop a process                |
-| `restart_process`    | `name`                                             | Restart a process             |
-| `add_process`        | `name`, `command`, `numprocesses?`, `working_dir?` | Add a new process dynamically |
+| `start_process`      | `name`                                             | Start a process (opt-in: write) |
+| `stop_process`       | `name`                                             | Stop a process (opt-in: write) |
+| `restart_process`    | `name`                                             | Restart a process (opt-in: write) |
+| `add_process`        | `name`, `command`, `numprocesses?`, `working_dir?` | Add a new process dynamically (opt-in: add) |
 
-> **Temporary workaround (until 1.1.0):** the current release does not cap its `mcp` dependency, so a fresh install resolves `mcp` 2.x and the MCP server crashes on startup with `AttributeError: 'Server' object has no attribute 'list_tools'`. Until 1.1.0 (which pins `mcp>=1.30,<2`) is released, launch it with `--with 'mcp<2'` as shown below (or `uvx --with 'mcp<2' circus-mcp mcp` without installing). Once 1.1.0 is out, this extra flag can be dropped.
+**Since 1.1.0 the server is read-only by default.** Only `list_processes` and `get_process_status` are exposed unless you opt in:
+
+| To enable | Environment variable | CLI flag |
+| --------- | -------------------- | -------- |
+| `start_process`, `stop_process`, `restart_process` | `CIRCUS_MCP_ALLOW_WRITE=1` | `--allow-write` |
+| `add_process` | `CIRCUS_MCP_ALLOW_ADD=1` | `--allow-add` |
+
+Results are JSON and failures are returned with `isError: true`.
+
+> **MCP SDK requirement:** 1.1.0 and later depend on `mcp>=1.30,<2`, so `uvx circus-mcp mcp` works without extra pins. Support for `mcp` 2.x is planned for 2.0.0. *Only if you are still on 1.0.x:* it does not cap `mcp`, so a fresh install resolves `mcp` 2.x and crashes with `AttributeError: 'Server' object has no attribute 'list_tools'`; upgrade, or launch with `uvx --with 'mcp<2' circus-mcp mcp`.
 
 ### Claude Code
 
 ```bash
-claude mcp add circus-mcp -- uv run --with 'mcp<2' circus-mcp mcp
+# read-only (default)
+claude mcp add circus-mcp -- uvx circus-mcp mcp
+
+# allow start/stop/restart
+claude mcp add circus-mcp -e CIRCUS_MCP_ALLOW_WRITE=1 -- uvx circus-mcp mcp
 ```
 
 ### VS Code / Cursor
@@ -47,11 +60,22 @@ claude mcp add circus-mcp -- uv run --with 'mcp<2' circus-mcp mcp
   "servers": {
     "circus-mcp": {
       "command": "uv",
-      "args": ["run", "--with", "mcp<2", "circus-mcp", "mcp"]
+      "args": ["run", "circus-mcp", "mcp"],
+      "env": {
+        "CIRCUS_ENDPOINT": "tcp://127.0.0.1:5555",
+        "CIRCUS_MCP_ALLOW_WRITE": "1"
+      }
     }
   }
 }
 ```
+
+## Security Notes
+
+- **The Circus control socket has no authentication.** Anyone who can reach the endpoint can add, start, stop or kill processes and quit circusd — regardless of this MCP server's settings. Keep `endpoint` on `127.0.0.1` (as in the bundled `circus.ini`) or use an `ipc://` socket protected by file permissions; never bind it to `0.0.0.0`.
+- The MCP server enforces this on its side: `CIRCUS_ENDPOINT` (or `--endpoint`) must be `ipc://…` or a loopback `tcp://` address. A remote endpoint is refused unless `CIRCUS_MCP_ALLOW_REMOTE_ENDPOINT=1` is set.
+- **`add_process` is arbitrary command execution** as the circusd user. A prompt injection (e.g. text in a log or issue the agent reads) could chain `add_process` → `start_process`. Enable `CIRCUS_MCP_ALLOW_ADD` only in disposable environments.
+- Write tools (`start_process`, `stop_process`, `restart_process`) are off by default; enable them with `CIRCUS_MCP_ALLOW_WRITE=1`.
 
 ## Circus MCP vs Supervisord MCP
 

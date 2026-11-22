@@ -5,6 +5,40 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-11-22
+
+### Security
+- **Write tools are disabled by default.** The MCP server now exposes only
+  `list_processes` and `get_process_status` unless explicitly enabled:
+  `CIRCUS_MCP_ALLOW_WRITE=1` / `--allow-write` for `start_process`, `stop_process`,
+  `restart_process`, and a separate `CIRCUS_MCP_ALLOW_ADD=1` / `--allow-add` for
+  `add_process` (which runs arbitrary commands as the circusd user). Disabled tools are
+  hidden from `tools/list` and rejected with `isError: true`.
+- The Circus endpoint must be `ipc://` or loopback `tcp://`; other endpoints are refused
+  unless `CIRCUS_MCP_ALLOW_REMOTE_ENDPOINT=1`, since the Circus control socket is
+  unauthenticated. README documents the threat model.
+
+### Fixed
+- Pin the MCP SDK to `mcp>=1.30,<2`. Without an upper bound a fresh install resolved
+  `mcp` 2.x and the server crashed on startup (`'Server' object has no attribute 'list_tools'`).
+- `__version__` reported 1.0.0; it is now read from the installed package metadata.
+- Tool failures are returned with `isError: true` instead of a success result.
+
+### Added
+- `CIRCUS_ENDPOINT` / `--endpoint` to select the Circus endpoint for the MCP server.
+- Regression tests, including an end-to-end stdio test against a real circusd.
+
+### Changed
+- Tool results are JSON instead of Python `repr`.
+- `mcp_config.json` example no longer contains a developer-local path.
+
+### Removed
+- Unused `logging` extra.
+
+### Breaking (behavioural)
+- Clients that relied on `start_process` / `stop_process` / `restart_process` /
+  `add_process` must now set the corresponding opt-in variable.
+
 ## [1.0.7] - 2024-12-21
 
 ### Fixed

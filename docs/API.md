@@ -199,11 +199,22 @@ uv run circus-mcp logs-all
 ### MCP Integration
 
 #### `mcp`
-Start MCP server for AI agent integration.
+Start MCP server for AI agent integration. **Read-only by default.**
 
 ```bash
-uv run circus-mcp mcp
+uv run circus-mcp mcp                          # list_processes, get_process_status only
+uv run circus-mcp mcp --allow-write            # + start/stop/restart_process
+uv run circus-mcp mcp --allow-write --allow-add  # + add_process (arbitrary commands)
 ```
+
+| Option | Environment variable | Default | Effect |
+|---|---|---|---|
+| `--endpoint` | `CIRCUS_ENDPOINT` | `tcp://127.0.0.1:5555` | Circus control endpoint |
+| `--allow-write` | `CIRCUS_MCP_ALLOW_WRITE=1` | off | Expose `start_process`, `stop_process`, `restart_process` |
+| `--allow-add` | `CIRCUS_MCP_ALLOW_ADD=1` | off | Expose `add_process` |
+| `--allow-remote-endpoint` | `CIRCUS_MCP_ALLOW_REMOTE_ENDPOINT=1` | off | Accept a non-loopback `tcp://` endpoint |
+
+Results are JSON (the Circus reply). Failures — including calls to disabled tools — are returned with `isError: true`.
 
 ## MCP Protocol API
 
@@ -212,7 +223,7 @@ uv run circus-mcp mcp
 The MCP server exposes the following tools for AI agents:
 
 #### `add_process`
-Add a new process to Circus.
+Add a new process to Circus. Requires `CIRCUS_MCP_ALLOW_ADD=1` / `--allow-add`: the command runs with the privileges of circusd, so enabling this gives the agent arbitrary command execution.
 
 **Input Schema:**
 ```json
@@ -225,7 +236,7 @@ Add a new process to Circus.
 ```
 
 #### `start_process`
-Start a process.
+Start a process. Requires `CIRCUS_MCP_ALLOW_WRITE=1` / `--allow-write` (as do `stop_process` and `restart_process`).
 
 **Input Schema:**
 ```json
