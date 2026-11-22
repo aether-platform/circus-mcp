@@ -187,3 +187,9 @@ def test_version_matches_metadata():
     import circus_mcp
 
     assert circus_mcp.__version__ == version("circus-mcp")
+
+
+def test_server_reports_package_version():
+    from importlib.metadata import version
+
+    assert CircusMCPServer().server.version == version("circus-mcp")

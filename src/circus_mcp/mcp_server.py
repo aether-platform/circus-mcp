@@ -173,7 +173,9 @@ class CircusMCPServer:
             enabled |= ADD_TOOLS
         self.enabled_tools = frozenset(enabled)
 
-        self.server = Server("circus-mcp")
+        from . import __version__
+
+        self.server = Server("circus-mcp", version=__version__)
         self.manager = CircusManager(endpoint=self.endpoint)
         self._setup_tools()
 
