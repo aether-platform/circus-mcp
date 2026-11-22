@@ -1,14 +1,11 @@
 {
   "mcpServers": {
     "circus-mcp": {
-      "command": "uv",
-      "args": [
-        "run",
-        "circus-mcp",
-        "mcp"
-      ],
-      "cwd": "/mnt/c/workspace/vibecoding-platform/mcp/circus",
-      "env": {}
+      "command": "uvx",
+      "args": ["circus-mcp", "mcp"],
+      "env": {
+        "CIRCUS_ENDPOINT": "tcp://127.0.0.1:5555"
+      }
     }
   }
 }

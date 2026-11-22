@@ -188,7 +188,7 @@ For AI agent integration, use `mcp_config.json`:
 
 - `circus>=0.18.0` - Process manager
 - `pyzmq>=25.0.0` - ZeroMQ for Circus communication
-- `mcp>=1.0.0` - Model Context Protocol
+- `mcp>=1.30,<2` - Model Context Protocol (Python SDK 1.x)
 - `click>=8.1.0` - CLI framework
 - `psutil>=5.9.0` - System information
 
